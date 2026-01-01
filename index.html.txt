@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Seni Seviyorum ❤️</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+video {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  display: none;
+}
+
+#snow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+#card {
+  position: absolute;
+  width: 80vw;
+  max-width: 400px;
+  aspect-ratio: 3/4;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: 0.8s;
+  text-align: center;
+  z-index: 10;
+}
+
+#card h1 {
+  color: #d60000;
+  margin-top: 10px;
+}
+
+#note {
+  font-size: 16px;
+  line-height: 1.4;
+  color: #333;
+  margin: 10px 0 15px 0;
+}
+
+#card img {
+  width: 80%;
+  border-radius: 15px;
+  box-shadow: 0 0 20px pink;
+  margin-bottom: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Videolar -->
+<video id="v1" src="fly.mp4" playsinline muted></video>
+<video id="v2" src="land.mp4" playsinline muted></video>
+<video id="v3" src="gift.mp4" playsinline muted></video>
+
+<!-- Kar efekti -->
+<canvas id="snow"></canvas>
+
+<!-- Kart -->
+<div id="card">
+  <h1>🎄 Mutlu Yıllar🎄</h1>
+  <p id="note"></p>
+  <img id="photo" src="photo.jpg" alt="Sevgilim">
+</div>
+
+<script>
+// Videolar
+const v1 = document.getElementById("v1");
+const v2 = document.getElementById("v2");
+const v3 = document.getElementById("v3");
+const card = document.getElementById("card");
+const photo = document.getElementById("photo");
+const note = document.getElementById("note");
+
+// Daktilo metni
+const noteText = `Seni kırdığım her an için özür dilerim.
+Bana yaşattığın her mutluluğun zerresi için
+tek tek teşekkür ederim.
+Bana bu senenin en iyi hediyesi sen değilsin
+Her zamanın Ömrümün en iyi ve tek hediyesisin.
+Her seneye senle girmek istiyorun
+(Beni hiç brakma)
+
+Seni çooooook seviyorummmmm sevgilim ❤️`;
+
+// Daktilo fonksiyonu
+function typeNote(textElement, text, speed=35){
+  let i=0;
+  function addChar(){
+    if(i<text.length){
+      textElement.innerHTML += text.charAt(i)==="\n" ? "<br>" : text.charAt(i);
+      i++;
+      setTimeout(addChar, speed);
+    }
+  }
+  addChar();
+}
+
+// Videoları sırayla oynatma
+function playVideo(video){
+  document.querySelectorAll("video").forEach(v=>{
+    v.pause();
+    v.style.display="none";
+  });
+  video.style.display="block";
+  video.play();
+}
+
+playVideo(v1);
+v1.onended = () => playVideo(v2);
+v2.onended = () => playVideo(v3);
+
+// Son video bittiğinde kart ve daktilo efekti
+v3.onended = ()=>{
+  photo.src = "photo.jpg";
+  setTimeout(()=>{
+    card.style.opacity = 1;
+    card.style.transform = "scale(1)";
+    typeNote(note, noteText, 35); // Kesin çalışacak
+  }, 200);
+};
+
+// Kar efekti
+const canvas = document.getElementById("snow");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const flakes = [];
+for(let j=0;j<100;j++){
+  flakes.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*4+1,
+    d: Math.random()
+  });
+}
+
+function drawFlakes(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  ctx.beginPath();
+  for(let i=0;i<flakes.length;i++){
+    const f=flakes[i];
+    ctx.moveTo(f.x,f.y);
+    ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true);
+  }
+  ctx.fill();
+  moveFlakes();
+}
+
+function moveFlakes(){
+  for(let i=0;i<flakes.length;i++){
+    const f=flakes[i];
+    f.y += Math.pow(f.d,2)+1;
+    f.x += Math.sin(f.y*0.01)*2;
+    if(f.y>canvas.height){
+      f.y=-5;
+      f.x=Math.random()*canvas.width;
+    }
+  }
+}
+
+setInterval(drawFlakes,30);
+window.addEventListener("resize",()=>{
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+});
+</script>
+
+</body>
+</html>
